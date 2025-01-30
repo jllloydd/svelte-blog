@@ -22,6 +22,7 @@
 	//state set up for pagination
 	let currentPage = $state(1);
 	let postsPerPage = 3; //setting the number of posts per page for pagination
+	let totalPosts = $state(0);
 
 	//user authentication checking onmount
 	onMount(async () => {
@@ -73,18 +74,19 @@
 	let posts = $state<Post[]>([]);
 
 	async function fetchPosts() {
-		console.log('Fetching posts...');
-		//fetching all posts from the database with profiles
+		const { count } = await supabase
+			.from('posts')
+			.select('*', { count: 'exact', head: true });
+		
+		totalPosts = count ?? 0;
 		const { data, error } = await supabase
 			.from('posts')
-			.select(
-				`
+			.select(`
 				*,
 				profiles (
 					username
 				)
-			`
-			)
+			`)
 			.order('created_at', { ascending: false })
 			.range((currentPage - 1) * postsPerPage, currentPage * postsPerPage - 1);
 
@@ -156,14 +158,16 @@
 				>
 					Previous
 				</button>
-				<span class="flex items-center text-sm text-white md:text-base">Page {currentPage}</span>
+				<span class="flex items-center text-sm text-white md:text-base">
+					Page {currentPage} of {Math.ceil(totalPosts / postsPerPage)}
+				</span>
 				<button
 					class="rounded-md bg-orange-700 px-2 py-2 text-sm text-white disabled:opacity-50 md:px-4 md:text-base"
 					onclick={() => {
 						currentPage++;
 						fetchPosts();
 					}}
-					disabled={posts.length < postsPerPage}
+					disabled={currentPage >= Math.ceil(totalPosts / postsPerPage)}
 				>
 					Next
 				</button>
