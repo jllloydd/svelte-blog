@@ -1,7 +1,7 @@
 <script lang="ts">
 	import svelte from '../public/img/svelte.svg';
-	import {signIn} from '$lib/auth';
-	import {signUp} from '$lib/auth';
+	import { signIn } from '$lib/auth';
+	import { signUp } from '$lib/auth';
 
 	//setting up states for reactivity
 	let showRegisterModal = $state(false);
@@ -19,23 +19,23 @@
 	let error = $state<string | null>(null);
 
 	//function for handling the login process
-	async function handleLogin(){
+	async function handleLogin() {
 		isLoading = true; //setting up loading state if login takes time
 		error = null;
 
-		try{
+		try {
 			await signIn(username, password); //taking in the reactive values in the forms
 			window.location.href = '/blog'; //automatically redirects to blog page after login
-		} catch(e) {
+		} catch (e) {
 			error = (e as Error).message;
 		} finally {
 			isLoading = false;
 		}
-	}	
+	}
 
 	//handling the registration process
 	async function handleRegister(event: SubmitEvent) {
-		event.preventDefault(); 
+		event.preventDefault();
 		isLoading = true; //setting up loading state if registration takes time
 		error = null;
 
@@ -50,16 +50,16 @@
 	}
 </script>
 
-<main class="flex h-screen bg-gradient-to-tr from-orange-300 to-yellow-100">
-	<!-- Left side with image -->
-	<div class="flex h-full w-7/12 items-center justify-center">
-		<img src={svelte} alt="Blog welcome image" class="h-80 w-80" />
+<main class="flex h-screen flex-col bg-gradient-to-tr from-orange-300 to-yellow-100 md:flex-row">
+	<!-- left side with image -->
+	<div class="flex h-1/3 w-full items-center justify-center md:h-full md:w-7/12">
+		<img src={svelte} alt="Blog welcome image" class="h-40 w-40 md:h-80 md:w-80" />
 	</div>
 
-	<!-- Right side with login form -->
-	<div class="flex w-5/12 items-center justify-center">
+	<!-- right side with login form -->
+	<div class="flex w-full items-center justify-center md:w-5/12">
 		<div
-			class="container flex w-8/12 flex-col items-center justify-center rounded-lg bg-white p-8 shadow-lg"
+			class="container flex w-11/12 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg md:w-8/12 md:p-8"
 		>
 			<div class="flex flex-col items-center justify-center space-y-4">
 				<h1 class="text-center text-2xl font-bold">Welcome to SvelteBlog</h1>
@@ -98,7 +98,7 @@
 					disabled={isLoading}
 					class="w-50 rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300"
 				>
-				{isLoading ? 'Logging in...' : 'Login'}
+					{isLoading ? 'Logging in...' : 'Login'}
 				</button>
 
 				<p class="text-sm text-gray-500">
@@ -113,8 +113,8 @@
 </main>
 
 {#if showRegisterModal}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-		<div class="w-96 rounded-lg bg-white p-8 shadow-xl">
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+		<div class="w-full max-w-sm rounded-lg bg-white p-4 shadow-xl md:w-96 md:p-8">
 			<div class="mb-6 flex justify-between">
 				<h2 class="text-xl font-bold">Register</h2>
 				<button

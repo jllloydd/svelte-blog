@@ -92,7 +92,7 @@ export async function signUp(username: string, password: string) {
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
-  authState.setUser(null); 
+  authState.setUser(null);
   window.location.href = '/'; //redirect to main page after logout
 }
 
@@ -101,7 +101,7 @@ export async function requireAuth() {
   if (browser) {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  
+
   const user = authState.getUser();
   console.log('Checking auth after delay, current user:', user);
 

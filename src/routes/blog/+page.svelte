@@ -77,12 +77,14 @@
 		//fetching all posts from the database with profiles
 		const { data, error } = await supabase
 			.from('posts')
-			.select(`
+			.select(
+				`
 				*,
 				profiles (
 					username
 				)
-			`)
+			`
+			)
 			.order('created_at', { ascending: false })
 			.range((currentPage - 1) * postsPerPage, currentPage * postsPerPage - 1);
 
@@ -106,7 +108,7 @@
 			.on(
 				'postgres_changes',
 				{
-					event: '*', 
+					event: '*',
 					schema: 'public',
 					table: 'posts'
 				},
@@ -132,17 +134,20 @@
 	<div>Loading...</div>
 {:else if user}
 	<Navbar />
-	<main class="flex justify-center pb-24 pt-8">
-		<div class="flex w-5/6 flex-col space-y-4 rounded-lg bg-slate-800 px-5 py-5 shadow-md">
-			<h1 class="mb-3 text-4xl font-bold text-white">All Blogs</h1>
+
+	<main class="flex justify-center px-4 pb-24 pt-8 md:px-0">
+		<div
+			class="flex w-full flex-col space-y-4 rounded-lg bg-slate-800 px-3 py-5 shadow-md md:w-5/6 md:px-5"
+		>
+			<h1 class="mb-3 text-2xl font-bold text-white md:text-4xl">All Blogs</h1>
 			{#each posts as post}
 				<BlogCard {post} />
 			{/each}
 
 			<!-- pagination setup-->
-			<div class="flex justify-center gap-4 mt-6">
+			<div class="mt-6 flex justify-center gap-2 md:gap-4">
 				<button
-					class="px-4 py-2 rounded-md bg-orange-700 text-white disabled:opacity-50"
+					class="rounded-md bg-orange-700 px-2 py-2 text-sm text-white disabled:opacity-50 md:px-4 md:text-base"
 					onclick={() => {
 						currentPage--;
 						fetchPosts();
@@ -151,9 +156,9 @@
 				>
 					Previous
 				</button>
-				<span class="flex items-center text-white">Page {currentPage}</span>
+				<span class="flex items-center text-sm text-white md:text-base">Page {currentPage}</span>
 				<button
-					class="px-4 py-2 rounded-md bg-orange-700 text-white disabled:opacity-50"
+					class="rounded-md bg-orange-700 px-2 py-2 text-sm text-white disabled:opacity-50 md:px-4 md:text-base"
 					onclick={() => {
 						currentPage++;
 						fetchPosts();
@@ -168,12 +173,12 @@
 		<button
 			type="button"
 			onclick={() => (showCreateModal = true)}
-			class="fixed bottom-8 right-8 rounded-full bg-orange-700 p-3 font-bold text-white shadow-lg hover:bg-orange-800 focus:outline-none focus:ring-4 focus:ring-orange-300"
+			class="fixed bottom-8 right-4 rounded-full bg-orange-700 p-2 font-bold text-white shadow-lg hover:bg-orange-800 focus:outline-none focus:ring-4 focus:ring-orange-300 md:right-8 md:p-3"
 		>
-			<span class="flex items-center gap-2">
+			<span class="flex items-center gap-1 md:gap-2">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					class="h-6 w-6"
+					class="h-5 w-5 md:h-6 md:w-6"
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
@@ -185,15 +190,15 @@
 						d="M12 4v16m8-8H4"
 					/>
 				</svg>
-				<span>Create Post</span>
+				<span class="text-sm md:text-base">Create Post</span>
 			</span>
 		</button>
 
 		{#if showCreateModal}
-			<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-				<div class="w-[600px] rounded-lg bg-white p-8 shadow-xl">
+			<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+				<div class="w-full max-w-[600px] rounded-lg bg-white p-4 shadow-xl md:p-8">
 					<div class="mb-6 flex justify-between">
-						<h2 class="text-xl font-bold">Create New Post</h2>
+						<h2 class="text-lg font-bold md:text-xl">Create New Post</h2>
 						<button
 							class="text-gray-500 hover:text-gray-700"
 							onclick={() => (showCreateModal = false)}
