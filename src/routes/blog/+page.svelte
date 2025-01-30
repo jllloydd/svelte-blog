@@ -65,15 +65,24 @@
 	}
 
 	//function to fetch all posts
-	type Post = Database['public']['Tables']['posts']['Row'];
+	type Post = Database['public']['Tables']['posts']['Row'] & {
+		profiles: {
+			username: string;
+		};
+	};
 	let posts = $state<Post[]>([]);
 
 	async function fetchPosts() {
 		console.log('Fetching posts...');
-		//fetching all posts from the database
+		//fetching all posts from the database with profiles
 		const { data, error } = await supabase
 			.from('posts')
-			.select('*')
+			.select(`
+				*,
+				profiles (
+					username
+				)
+			`)
 			.order('created_at', { ascending: false })
 			.range((currentPage - 1) * postsPerPage, currentPage * postsPerPage - 1);
 

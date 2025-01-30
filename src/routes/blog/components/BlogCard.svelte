@@ -11,12 +11,12 @@
             user_id: string;
             title: string;
             content: string;
+            profiles: {
+                username: string;
+            };
         }
     }>();
-    
-    //initializing the username state
-    let username = $state<string>('');
-    
+
     //date formatting for the date of the blog post
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -25,22 +25,6 @@
             day: 'numeric'
         });
     };
-
-    //getting the username of the user who posted the blog
-    onMount(async () => {
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('username')
-            .eq('id', props.post.user_id)
-            .single();
-            
-        if (error) {
-            console.error('Error fetching username:', error);
-            username = 'Unknown User';
-        } else {
-            username = data.username || 'Anonymous';
-        }
-    });
 
     //function to shorten the text if the blog post is too long
     const shortenText = (text: string, maxLength: number = 350) => {
@@ -55,7 +39,10 @@
 <article class="flex flex-col space-y-3 rounded-lg bg-white px-3 py-3 shadow-md">
 	<div class="flex items-center gap-3">
 		<h2 class="text-2xl font-bold">{props.post.title}</h2>
-		<span class="text-sm text-gray-400">Posted by: {username} on {formatDate(props.post.created_at)}</span>
+		<span class="text-sm text-gray-400">
+			Posted by: {props.post.profiles.username} 
+			on {formatDate(props.post.created_at)}
+		</span>
 		<!-- username will be displayed in the span element -->
 	</div>
 	<p class="text-sm">{shortenText(props.post.content)}</p>
@@ -84,7 +71,8 @@
         <div class="mt-2">
             <h2 class="mb-4 text-2xl font-bold">{props.post.title}</h2>
             <div class="mb-4 text-sm text-gray-600">
-                Posted by: {username} on {formatDate(props.post.created_at)}
+                Posted by: {props.post.profiles.username}
+                on {formatDate(props.post.created_at)}
             </div>
             <div class="prose max-w-none">
                 <p class="whitespace-pre-wrap">{props.post.content}</p>
