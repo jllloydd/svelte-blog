@@ -2,6 +2,7 @@
 	import svelte from '../public/img/svelte.svg';
 	import { signIn } from '$lib/auth';
 	import { signUp } from '$lib/auth';
+	import { base } from '$app/paths';
 
 	//setting up states for reactivity
 	let showRegisterModal = $state(false);
@@ -25,7 +26,7 @@
 
 		try {
 			await signIn(username, password); //taking in the reactive values in the forms
-			window.location.href = '/blog'; //automatically redirects to blog page after login
+			window.location.href = `${base}/blog`; // updated path
 		} catch (e) {
 			error = (e as Error).message;
 		} finally {
@@ -41,7 +42,7 @@
 
 		try {
 			await signUp(register_username, register_password); //taking in the reactive values in the forms
-			window.location.href = '/blog'; // automatically redirect to blog page after registration
+			window.location.href = `${base}/blog`; // Updated path
 		} catch (e) {
 			error = (e as Error).message;
 		} finally {

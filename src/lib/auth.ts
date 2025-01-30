@@ -1,6 +1,7 @@
 import { supabase } from '$lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import { browser } from '$app/environment';
+import { base } from '$app/paths';
 
 // manual state management for user since $state runes can't be used externally
 class AuthState {
@@ -93,7 +94,7 @@ export async function signOut() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
   authState.setUser(null);
-  window.location.href = '/'; //redirect to main page after logout
+  window.location.href = `${base}/`; 
 }
 
 // check if user is authenticated
@@ -106,7 +107,7 @@ export async function requireAuth() {
   console.log('Checking auth after delay, current user:', user);
 
   if (!user && browser) {
-    window.location.href = '/'; //redirect to main page if not authenticated
+    window.location.href = `${base}/`; 
     throw new Error('Not authenticated');
   }
   return user;
