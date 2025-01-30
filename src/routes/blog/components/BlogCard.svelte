@@ -1,16 +1,51 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+    import { supabase } from '$lib/supabase';
+    
+    const props = $props<{
+        post: {
+            id: string;
+            created_at: string;
+            updated_at: string;
+            user_id: string;
+            title: string;
+            content: string;
+        }
+    }>();
+    
+    let username = $state<string>('');
+    
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
 
+    onMount(async () => {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', props.post.user_id)
+            .single();
+            
+        if (error) {
+            console.error('Error fetching username:', error);
+            username = 'Unknown User';
+        } else {
+            username = data.username || 'Anonymous';
+        }
+    });
 </script>
-
-<h1 class="mb-3 text-4xl font-bold text-white">All Blogs</h1>
 
 <article class="flex flex-col space-y-3 rounded-lg bg-white px-3 py-3 shadow-md">
 	<div class="flex items-center gap-3">
-		<h2 class="text-2xl font-bold">Title</h2>
-		<span class="text-sm text-gray-400">Posted by: *user* on *date*</span>
+		<h2 class="text-2xl font-bold">{props.post.title}</h2>
+		<span class="text-sm text-gray-400">Posted by: {username} on {formatDate(props.post.created_at)}</span>
 		<!-- username will be displayed in the span element -->
 	</div>
-	<p class="text-sm">lorem ipsum dolor something something whatever man testing lang</p>
+	<p class="text-sm">{props.post.content}</p>
 	<div class="flex justify-end">
 		<button
 			type="button"
