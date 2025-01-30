@@ -1,11 +1,53 @@
 <script lang="ts">
 	import svelte from '../public/img/svelte.svg';
+	import {signIn} from '$lib/auth';
+	import {signUp} from '$lib/auth';
 
 	//setting up states for reactivity
 	let showRegisterModal = $state(false);
+
+	//registration state declaration
 	let register_username = $state('');
 	let register_password = $state('');
 
+	//sign in states
+	let username = $state('');
+	let password = $state('');
+
+	//other miscellaneous states for error and loading
+	let isLoading = $state(false);
+	let error = $state<string | null>(null);
+
+	//function for handling the login process
+	async function handleLogin(){
+		isLoading = true; //setting up loading state if login takes time
+		error = null;
+
+		try{
+			await signIn(username, password); //taking in the reactive values in the forms
+			window.location.href = '/blog'; //automatically redirects to blog page after login
+		} catch(e) {
+			error = (e as Error).message;
+		} finally {
+			isLoading = false;
+		}
+	}	
+
+	//handling the registration process
+	async function handleRegister(event: SubmitEvent) {
+		event.preventDefault(); 
+		isLoading = true; //setting up loading state if registration takes time
+		error = null;
+
+		try {
+			await signUp(register_username, register_password); //taking in the reactive values in the forms
+			window.location.href = '/blog'; // automatically redirect to blog page after registration
+		} catch (e) {
+			error = (e as Error).message;
+		} finally {
+			isLoading = false;
+		}
+	}
 </script>
 
 <main class="flex h-screen bg-gradient-to-tr from-orange-300 to-yellow-100">
@@ -27,6 +69,8 @@
 						<input
 							type="text"
 							id="username"
+							bind:value={username}
+							disabled={isLoading}
 							name="username"
 							placeholder="Username"
 							class="w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -39,6 +83,8 @@
 						<input
 							type="password"
 							id="password"
+							bind:value={password}
+							disabled={isLoading}
 							name="password"
 							placeholder="Password"
 							class="w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -48,14 +94,18 @@
 
 				<button
 					type="button"
+					onclick={handleLogin}
+					disabled={isLoading}
 					class="w-50 rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300"
 				>
-					Login
+				{isLoading ? 'Logging in...' : 'Login'}
 				</button>
 
 				<p class="text-sm text-gray-500">
 					Don't have an account?
-					<button class="text-blue-500 hover:underline" onclick={() => showRegisterModal = true}> Register </button>
+					<button class="text-blue-500 hover:underline" onclick={() => (showRegisterModal = true)}>
+						Register
+					</button>
 				</p>
 			</div>
 		</div>
@@ -67,20 +117,32 @@
 		<div class="w-96 rounded-lg bg-white p-8 shadow-xl">
 			<div class="mb-6 flex justify-between">
 				<h2 class="text-xl font-bold">Register</h2>
-				<button class="text-gray-500 hover:text-gray-700" onclick={() => showRegisterModal = false}> ✕ </button>
+				<button
+					class="text-gray-500 hover:text-gray-700"
+					onclick={() => (showRegisterModal = false)}
+					disabled={isLoading}
+				>
+					✕
+				</button>
 			</div>
 
-			<form class="space-y-4">
+			{#if error}
+				<div class="mb-4 rounded-md bg-red-50 p-4 text-red-500">
+					{error}
+				</div>
+			{/if}
+
+			<form class="space-y-4" onsubmit={handleRegister}>
 				<fieldset>
 					<label for="register-username">
 						<input
 							type="text"
-							bind:value={register_username}
 							id="register-username"
-							name="register-username"
+							bind:value={register_username}
 							placeholder="Username"
 							class="w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
 							required
+							disabled={isLoading}
 						/>
 					</label>
 				</fieldset>
@@ -89,21 +151,22 @@
 					<label for="register-password">
 						<input
 							type="password"
-							bind:value={register_password}
 							id="register-password"
-							name="register-password"
+							bind:value={register_password}
 							placeholder="Password"
 							class="w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
 							required
+							disabled={isLoading}
 						/>
 					</label>
 				</fieldset>
 
 				<button
 					type="submit"
-					class="w-full rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300"
+					class="w-full rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 disabled:opacity-50"
+					disabled={isLoading}
 				>
-					Create Account
+					{isLoading ? 'Creating Account...' : 'Create Account'}
 				</button>
 			</form>
 		</div>

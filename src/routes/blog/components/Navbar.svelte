@@ -1,5 +1,6 @@
 <script lang="ts">
 	import svelte from '../../../public/img/svelte.svg';
+	import { signOut } from '$lib/auth';
 </script>
 
 <nav class="border-gray-200 bg-white shadow-md">
@@ -11,6 +12,7 @@
 		<div class="flex space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
 			<button
 				type="button"
+				onclick={signOut}
 				class="rounded-lg bg-orange-700 px-4 py-2 text-center text-sm font-medium text-white hover:bg-orange-800 focus:outline-none focus:ring-4 focus:ring-orange-300"
 				>Logout</button
 			>
