@@ -1,5 +1,11 @@
 <script lang="ts">
 	import svelte from '../public/img/svelte.svg';
+
+	//setting up states for reactivity
+	let showRegisterModal = $state(false);
+	let register_username = $state('');
+	let register_password = $state('');
+
 </script>
 
 <main class="flex h-screen bg-gradient-to-tr from-orange-300 to-yellow-100">
@@ -48,12 +54,58 @@
 				</button>
 
 				<p class="text-sm text-gray-500">
-					Don't have an account? <a href="/register" class="text-blue-500 hover:underline"
-						>Register</a
-					>
+					Don't have an account?
+					<button class="text-blue-500 hover:underline" onclick={() => showRegisterModal = true}> Register </button>
 				</p>
-				<!-- create a modal for registration later -->
 			</div>
 		</div>
 	</div>
 </main>
+
+{#if showRegisterModal}
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+		<div class="w-96 rounded-lg bg-white p-8 shadow-xl">
+			<div class="mb-6 flex justify-between">
+				<h2 class="text-xl font-bold">Register</h2>
+				<button class="text-gray-500 hover:text-gray-700" onclick={() => showRegisterModal = false}> ✕ </button>
+			</div>
+
+			<form class="space-y-4">
+				<fieldset>
+					<label for="register-username">
+						<input
+							type="text"
+							bind:value={register_username}
+							id="register-username"
+							name="register-username"
+							placeholder="Username"
+							class="w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+							required
+						/>
+					</label>
+				</fieldset>
+
+				<fieldset>
+					<label for="register-password">
+						<input
+							type="password"
+							bind:value={register_password}
+							id="register-password"
+							name="register-password"
+							placeholder="Password"
+							class="w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+							required
+						/>
+					</label>
+				</fieldset>
+
+				<button
+					type="submit"
+					class="w-full rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300"
+				>
+					Create Account
+				</button>
+			</form>
+		</div>
+	</div>
+{/if}
