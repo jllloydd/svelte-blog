@@ -24,16 +24,48 @@
 	let postsPerPage = 3; //setting the number of posts per page for pagination
 	let totalPosts = $state(0);
 
-	//user authentication checking onmount
-	onMount(async () => {
-		try {
-			const authUser = await requireAuth();
-			user = authUser;
-		} catch (e: any) {
-			authError = e.message;
-		} finally {
-			isLoading = false;
+	// reworked onmount function
+	onMount(() => {
+		let subscription: any; 
+
+		async function init() {
+			try {
+				const authUser = await requireAuth();
+				user = authUser;
+
+				// Move the posts-related initialization here after auth completes
+				console.log('Component mounted, setting up subscription...');
+				await fetchPosts();
+
+				// real time subscription set up
+				subscription = supabase
+					.channel('posts_channel')
+					.on(
+						'postgres_changes',
+						{
+							event: '*',
+							schema: 'public',
+							table: 'posts'
+						},
+						(payload) => {
+							console.log('Received database change:', payload);
+							fetchPosts();
+						}
+					)
+					.subscribe();
+			} catch (e: any) {
+				authError = e.message;
+			} finally {
+				isLoading = false;
+			}
 		}
+
+		init(); //call function upon onMount
+		
+		return () => { //cleanup function
+			console.log('Cleaning up subscription...');
+			subscription?.unsubscribe();
+		};
 	});
 
 	//function to handle post creation
@@ -98,38 +130,6 @@
 		console.log('Posts fetched successfully:', data);
 		posts = data;
 	}
-
-	//fetching all posts as DOM loads
-	onMount(() => {
-		console.log('Component mounted, setting up subscription...');
-		fetchPosts();
-
-		// real time subscription set up
-		const subscription = supabase
-			.channel('posts_channel')
-			.on(
-				'postgres_changes',
-				{
-					event: '*',
-					schema: 'public',
-					table: 'posts'
-				},
-				(payload) => {
-					console.log('Received database change:', payload);
-					// refetch posts when any change occurs
-					fetchPosts();
-				}
-			)
-			.subscribe((status) => {
-				console.log('Subscription status:', status);
-			});
-
-		// reset subscription after site use
-		return () => {
-			console.log('Cleaning up subscription...');
-			subscription.unsubscribe();
-		};
-	});
 </script>
 
 {#if isLoading}
